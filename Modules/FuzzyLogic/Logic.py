@@ -91,10 +91,10 @@ class Logic():
         self.day_length.view()
 
     def simulate_logic(self):
-        self.laying_eggs.input['temperature'] = 1
-        self.laying_eggs.input['pollen'] = 3
-        self.laying_eggs.input['day length'] = 9
-        self.laying_eggs.input['bees num'] = 15000
+        self.laying_eggs.input['temperature'] = 0
+        self.laying_eggs.input['pollen'] = 1
+        self.laying_eggs.input['day length'] = 8
+        self.laying_eggs.input['bees num'] = 5000
         self.laying_eggs.compute()
 
         app = QApplication(sys.argv)
