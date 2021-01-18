@@ -97,7 +97,7 @@ class BeesDevelopment:
     def update_pupa_drone(self, new_pupa):
         self.stage_pupa_drone.append(new_pupa)
         self.pupa_drone_counter += new_pupa
-        if len(self.stage_pupa) > 8:
+        if len(self.stage_pupa_drone) > 8:
             new_stage = self.stage_pupa_drone.pop(0)
             self.pupa_drone_counter -= new_stage
             self.update_imago_drone(new_stage)
