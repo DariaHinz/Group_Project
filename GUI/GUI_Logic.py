@@ -135,8 +135,9 @@ class LogicInterface(QWidget):
 
     @pyqtSlot()
     def on_click_start(self):
-        update_defines(self.bees.value())
+        update_defines(self.bees.value(),self.eggs)
         self.simulation = Simulation()
+        self.simulation.month = 0 # self.month.value()
         for day in range(1, NUM_OF_SIMULATED_DAYS):
             self.day_index = day
             print(self.daily_temperature[((self.temperature.value() - 1) * 30) + self.day_index])

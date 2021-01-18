@@ -62,7 +62,7 @@ class HiveProcessesLogic:
         self.collected_pollen.input['day length'] = day_length_value
         self.collected_pollen.input['bees num'] = amount_of_bees
         self.collected_pollen.compute()
-        self.pollen.view(sim=self.collected_pollen)
+        #self.pollen.view(sim=self.collected_pollen)
         #mngr = plt.get_current_fig_manager()
         #mngr.window.setGeometry(1180, 370, 600, 435)
         #fig = pyplot.gcf()

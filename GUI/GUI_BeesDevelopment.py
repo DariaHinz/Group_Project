@@ -22,7 +22,7 @@ class Simulation():
          "Imago workers nectar collectors", "Imago workers pollen collectors", "Imago drones"]
         self.bee_hive = BeesDevelopment(eggs_start, larvas_start, before_pupas_start, pupas_start, imagos_start,workers)
         self.eggs =[self.bee_hive.eggs_counter]
-        self.income_eggs =[]
+        self.income_eggs =[0]
         self.larvas=[self.bee_hive.larva_counter]
         self.before_pupas=[self.bee_hive.before_pupa_counter]
         self.before_pupas_drone =[self.bee_hive.before_pupa_drone_counter]
@@ -34,6 +34,7 @@ class Simulation():
         self.imago_drone=[self.bee_hive.imago_drone_counter]
         self.prev_count=[]
         self.current_count=[]
+        self.month = 0
         self.fig1 = plt.Figure()
         self.fig2 = plt.Figure()
         self.fig3 = plt.Figure()
@@ -46,6 +47,24 @@ class Simulation():
         self.fig10 = plt.Figure()
         self.fig11 = plt.Figure()
         self.fig12 = plt.Figure()
+        self.fig13 = plt.Figure()
+        self.fig14 = plt.Figure()
+    def mounths_list(self, base_list):
+        mlist = [0]
+        current_month = 0
+        if self.month > 0 :
+            current_month = self.month - 1
+
+        for i in range(0, len(base_list)):
+            if i%30 > 0:
+                mlist[current_month]+=base_list[i]
+            else:
+                current_month+=1
+                mlist.append(0)
+
+        return mlist
+
+
 
     def init_GUI(self):
         self.eggs_label = tk.Label(window, text="Puts number of new eggs:")
@@ -161,8 +180,28 @@ class Simulation():
         ax = freq_series.plot(kind='bar')
         plt.xticks(self.xlabel(len(self.income_eggs)), rotation=90)
         plt.show(block=False)
-        #plt.savefig("generated_eggs_plot.png")
 
+    def generate_eggs_income_average_chart(self):
+        plt.close(self.fig13)
+        self.fig13 = plt.figure(13)
+        plt.title("Average eggs per day in month")
+        mlist = [meggs / 30 for meggs in self.mounths_list(self.income_eggs)]
+        freq_series = pd.Series(mlist)
+        ax = freq_series.plot(kind='bar')
+        plt.xticks(range(1,14))
+        plt.xlabel("Months")
+        plt.show(block=False)
+
+    def generate_eggs_income_per_month_chart(self):
+        plt.close(self.fig14)
+        self.fig12 = plt.figure(14)
+        plt.title("Sum of generated eggs in month")
+        mlist = self.mounths_list(self.income_eggs)
+        freq_series = pd.Series(mlist)
+        ax = freq_series.plot(kind='bar')
+        plt.xticks(range(1,14))
+        plt.xlabel("Months")
+        plt.show(block=False)
 
     def generate_larvas_chart(self):
         plt.close(self.fig2)
@@ -282,6 +321,8 @@ class Simulation():
         if(self.chk_eggs.get() == True):
             self.generate_eggs_chart()
             self.generate_eggs_income_chart()
+            self.generate_eggs_income_per_month_chart()
+            self.generate_eggs_income_average_chart()
         if(self.chk_larvas.get()==True):
             self.generate_larvas_chart()
         if(self.chk_before_pupa.get()==True):
@@ -318,7 +359,8 @@ class Simulation():
     def generate_plot(self):
         self.check_checkboxes()
 
-def update_defines(bees_onstart):
+def update_defines(bees_onstart, eggs_onstart):
+    EGGS_START = eggs_onstart
     LARVAS_START = int(0.25 * bees_onstart)
     BFORE_PUPAS_START = int(0.25 * bees_onstart)
     PUPAS_START = int(0.15 * bees_onstart)

@@ -18,7 +18,7 @@ class Logic():
         self.pollen['good'] = fuzz.trimf(self.pollen.universe, [9, 14, 14])
 
         self.temperature['low'] = fuzz.trimf(self.temperature.universe, [-5, -5, 15])
-        self.temperature['medium'] = fuzz.trimf(self.temperature.universe, [12, 19, 26])
+        self.temperature['medium'] = fuzz.trimf(self.temperature.universe, [13, 19, 26])
         self.temperature['high'] = fuzz.trimf(self.temperature.universe, [23, 40, 40])
 
         self.day_length['short'] = fuzz.trimf(self.day_length.universe, [7, 7, 11])
