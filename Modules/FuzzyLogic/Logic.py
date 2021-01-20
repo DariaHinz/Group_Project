@@ -75,12 +75,14 @@ class Logic():
                            self.simulate_eggs['many'])
         rule15 = ctrl.Rule(self.day_length['long'] & self.temperature['high'] & self.pollen['good'],
                            self.simulate_eggs['a lot'])
-        rule16 = ctrl.Rule(self.bees_num['little'], self.simulate_eggs['none'])
+        rule19 = ctrl.Rule(self.day_length['long'] & self.temperature['high'],
+                           self.simulate_eggs['a lot'])
+        rule16 = ctrl.Rule(self.bees_num['little'], self.simulate_eggs['very little'])
         rule17 = ctrl.Rule(self.bees_num['little'] & self.pollen['poor'], self.simulate_eggs['none'])
-        rule18 = ctrl.Rule(self.pollen['poor'], self.simulate_eggs['none'])
+        rule18 = ctrl.Rule(self.pollen['poor'], self.simulate_eggs['very little'])
 
         eggs_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11,
-                                        rule12, rule13, rule14, rule15, rule16, rule17, rule18])
+                                        rule12, rule13, rule14, rule15, rule16, rule17, rule18, rule19])
         self.laying_eggs = ctrl.ControlSystemSimulation(eggs_ctrl)
 
     def show_inputs(self):
