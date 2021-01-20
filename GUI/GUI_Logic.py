@@ -22,12 +22,17 @@ import matplotlib.pyplot as plt
 from matplotlib import pyplot
 from PyQt5.QtCore import Qt, pyqtSlot
 
+#NUMBER_OF_GENERATED_DAYS = 1
 
 def changed_value(slider, label, string, laying_eggs):
     size = slider.value()
     label.setText(str(size))
     laying_eggs.input[string] = slider.value()
 
+def changed_value2(slider, label):
+    size = slider.value()
+    label.setText(str(size))
+    return size
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -40,7 +45,7 @@ class LogicInterface(QWidget):
     def __init__(self, sim_eggs, eggs, bees, pollen, temperature, day):
         super(LogicInterface, self).__init__(None)
         self.hive_processes_logic = HiveProcessesLogic(0, 0, 0)
-
+        #self.num_of_days = 1
         self.daily_temperature = []
         self.daily_day_length = []
         self.day_index = 0
@@ -56,28 +61,30 @@ class LogicInterface(QWidget):
         self.temperature_value = temperature
         self.day_len_exmp = day
 
-        self.month = QSlider
+        self.days = QSlider
         self.pollen = QSlider
+        self.days = self.create_slider(1, 365, 5)
+        self.days_l = QLabel("1")
         self.temperature = self.create_slider(1, 12, 1)
-        self.label_temp = QLabel("0")
+        self.label_temp = QLabel("1")
         self.pollen = self.create_slider(0, 14, 1)
         self.label_pollen = QLabel("0")
         self.bees = self.create_slider(0, 80000, 1000)
         self.label_bees = QLabel("0")
-        # self.day = self.create_slider(8, 18, 1)
-        # self.label_day = QLabel("8")
+        self.day = self.create_slider(8, 18, 1)
+        self.label_day = QLabel("8")
 
-        #button_generate = QPushButton('Generate', self)
-        #button_generate.clicked.connect(self.generate_eggs)
+        button_generate = QPushButton('Generate', self)
+        button_generate.clicked.connect(self.generate_eggs)
 
-        #button_temperature = QPushButton('Show dependence on temperature', self)
-        #button_temperature.clicked.connect(self.on_click_temp)
+        button_temperature = QPushButton('Show dependence on temperature', self)
+        button_temperature.clicked.connect(self.on_click_temp)
 
-        #button_day = QPushButton('Show dependence on day length', self)
-        #button_day.clicked.connect(self.on_click_day)
+      #  button_day = QPushButton('Show dependence on day length', self)
+      #  button_day.clicked.connect(self.on_click_day)
 
-        #button_pollen = QPushButton('Show dependence on pollen amount', self)
-        #button_pollen.clicked.connect(self.on_click_pollen)
+        button_pollen = QPushButton('Show dependence on pollen amount', self)
+        button_pollen.clicked.connect(self.on_click_pollen)
 
         button_start = QPushButton('Start simulation', self)
         button_start.clicked.connect(self.on_click_start)
@@ -90,18 +97,19 @@ class LogicInterface(QWidget):
         self.pollen.valueChanged.connect(
             lambda: changed_value(self.pollen, self.label_pollen, 'pollen', self.laying_eggs))
         self.bees.valueChanged.connect(lambda: changed_value(self.bees, self.label_bees, 'bees num', self.laying_eggs))
-        # self.day.valueChanged.connect(lambda: changed_value(self.day, self.label_day, 'day length', self.laying_eggs))
-
-        grid.addWidget(self.create_example_group("Miesiac startowy", self.temperature, self.label_temp), 0, 0)
-        grid.addWidget(self.create_example_group("Pokarm [kg]", self.pollen, self.label_pollen), 1, 0)
-        grid.addWidget(self.create_example_group("Liczba pszczół [os]", self.bees, self.label_bees), 2, 0)
-        # grid.addWidget(self.create_example_group("Długość dnia [h]", self.day, self.label_day), 3, 0)
-        #grid.addWidget(button_generate, 4, 0)
-        grid.addWidget(button_inputs, 3, 0)
-        #grid.addWidget(button_temperature, 6, 0)
-        # grid.addWidget(button_day, 7, 0)
-        #grid.addWidget(button_pollen, 8, 0)
-        grid.addWidget(button_start, 4, 0)
+        self.day.valueChanged.connect(lambda: changed_value(self.day, self.label_day, 'day length', self.laying_eggs))
+        self.days.valueChanged.connect(lambda: changed_value2(self.days, self.days_l))
+        grid.addWidget(self.create_example_group("Starting month", self.temperature, self.label_temp), 0, 0)
+        grid.addWidget(self.create_example_group("The number of days to generate", self.days, self.days_l), 1, 0)
+        grid.addWidget(self.create_example_group("Pollen [kg]", self.pollen, self.label_pollen), 2, 0)
+        grid.addWidget(self.create_example_group("The number of bees", self.bees, self.label_bees), 3, 0)
+       # grid.addWidget(self.create_example_group("Length of the day [h]", self.day, self.label_day), 4, 0)
+        grid.addWidget(button_generate, 4, 0)
+        grid.addWidget(button_inputs, 5, 0)
+        grid.addWidget(button_temperature, 6, 0)
+       # grid.addWidget(button_day, 8, 0)
+        grid.addWidget(button_pollen, 7, 0)
+        grid.addWidget(button_start, 8, 0)
         graphWidget = pg.PlotWidget()
 
         self.setLayout(grid)
@@ -135,11 +143,15 @@ class LogicInterface(QWidget):
 
     @pyqtSlot()
     def on_click_start(self):
-        update_defines(self.bees.value(),self.eggs)
+        num_of_days = changed_value2(self.days, self.days_l)
+        update_defines(self.bees.value(), self.eggs)
         self.simulation = Simulation()
         self.simulation.month = 0 # self.month.value()
-        for day in range(1, NUM_OF_SIMULATED_DAYS):
+        for day in range(1, num_of_days):
             self.day_index = day
+            ########## MIESIĄC ###################
+            # w zmiennej self.temperature.value() przechowywana jest wartość aktualnego miesiąca z suwaka
+            # w zmiennej num_of_days pobrana jest liczba dni z suwaka
             print(self.daily_temperature[((self.temperature.value() - 1) * 30) + self.day_index])
             print(self.daily_day_length[((self.temperature.value() - 1) * 30) + self.day_index])
 
@@ -200,6 +212,20 @@ class LogicInterface(QWidget):
     @pyqtSlot()
     def on_click_temp(self):
         self.on_apply()
+        temp = changed_value2(self.temperature, self.label_temp)
+
+        if temp == 12 or temp == 1:
+            self.laying_eggs.input['day length'] = 7
+        if temp == 2 or temp == 11:
+            self.laying_eggs.input['day length'] = 9
+        if temp == 3 or temp == 10:
+            self.laying_eggs.input['day length'] = 11
+        if temp == 4 or temp == 9:
+            self.laying_eggs.input['day length'] = 13
+        if temp == 7 or temp == 8:
+            self.laying_eggs.input['day length'] = 17
+        if temp == 6 or temp == 5:
+            self.laying_eggs.input['day length'] = 15
         plt.close('all')
         score_temp = []
         temp_sim = []
@@ -238,6 +264,27 @@ class LogicInterface(QWidget):
     @pyqtSlot()
     def on_click_pollen(self):
         self.on_apply()
+        temp = changed_value2(self.temperature, self.label_temp)
+
+        if temp == 12 or temp == 1:
+            self.laying_eggs.input['temperature'] = 0
+            self.laying_eggs.input['day length'] = 7
+        if temp == 2 or temp == 11:
+            self.laying_eggs.input['temperature'] = 10
+            self.laying_eggs.input['day length'] = 9
+        if temp == 3 or temp == 10:
+            self.laying_eggs.input['temperature'] = 15
+            self.laying_eggs.input['day length'] = 11
+        if temp == 4 or temp == 9:
+            self.laying_eggs.input['temperature'] = 20
+            self.laying_eggs.input['day length'] = 13
+        if temp == 7 or temp == 8:
+            self.laying_eggs.input['temperature'] = 30
+            self.laying_eggs.input['day length'] = 17
+        if temp == 6 or temp == 5:
+            self.laying_eggs.input['temperature'] = 25
+            self.laying_eggs.input['day length'] = 15
+
         plt.close('all')
         score_temp = []
         temp_sim = []
@@ -252,7 +299,7 @@ class LogicInterface(QWidget):
         mngr2 = plt.get_current_fig_manager()
         mngr2.window.setGeometry(1180, 370, 600, 435)
         fig = pyplot.gcf()
-        fig.canvas.set_window_title('Day Length dependence graph')
+        fig.canvas.set_window_title('Pollen dependence graph')
 
     def initialize_temperature(self, data):
         for k in range(0, 365):
