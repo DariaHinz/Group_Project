@@ -145,8 +145,7 @@ class LogicInterface(QWidget):
     def on_click_start(self):
         num_of_days = changed_value2(self.days, self.days_l)
         update_defines(self.bees.value(), self.eggs)
-        self.simulation = Simulation()
-        self.simulation.month = 0 # self.month.value()
+        self.simulation = Simulation(self.temperature.value(), num_of_days)
         for day in range(1, num_of_days):
             self.day_index = day
             ########## MIESIĄC ###################

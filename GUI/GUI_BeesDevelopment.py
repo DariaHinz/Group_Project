@@ -10,7 +10,7 @@ import math
 
 
 class Simulation():
-    def __init__(self):
+    def __init__(self, start_month, days):
         #### wartości startowe ####
         eggs_start = EGGS_START
         larvas_start = LARVAS_START
@@ -34,7 +34,9 @@ class Simulation():
         self.imago_drone=[self.bee_hive.imago_drone_counter]
         self.prev_count=[]
         self.current_count=[]
-        self.month = 0
+        self.month = start_month
+        self.end_whole_month = start_month + int(days/30)
+        self.last_month_days = int(days%30)
         self.fig1 = plt.Figure()
         self.fig2 = plt.Figure()
         self.fig3 = plt.Figure()
@@ -49,19 +51,30 @@ class Simulation():
         self.fig12 = plt.Figure()
         self.fig13 = plt.Figure()
         self.fig14 = plt.Figure()
-    def mounths_list(self, base_list):
+    def mounths_list(self, base_list,average):
         mlist = [0]
         current_month = 0
+        firstYear =True
         if self.month > 0 :
-            current_month = self.month - 1
+            current_month = self.month
+            for m in range(0,current_month):
+                mlist.append(0)
 
-        for i in range(0, len(base_list)):
+        for i in range(self.month, len(base_list)):
             if i%30 > 0:
                 mlist[current_month]+=base_list[i]
             else:
+                if current_month == 12:
+                    firstYear = False
                 current_month+=1
-                mlist.append(0)
-
+                if firstYear != False:
+                    mlist.append(0)
+        if average == True:
+            for a in range(0,len(mlist)):
+                if self.end_whole_month < a and self.last_month_days > 0:
+                    mlist[a] = mlist[a]/self.last_month_days
+                else:
+                    mlist[a] = mlist[a]/30
         return mlist
 
 
@@ -185,7 +198,7 @@ class Simulation():
         plt.close(self.fig13)
         self.fig13 = plt.figure(13)
         plt.title("Average eggs per day in month")
-        mlist = [meggs / 30 for meggs in self.mounths_list(self.income_eggs)]
+        mlist = self.mounths_list(self.income_eggs,True)
         freq_series = pd.Series(mlist)
         ax = freq_series.plot(kind='bar')
         plt.xticks(range(1,14))
@@ -196,7 +209,7 @@ class Simulation():
         plt.close(self.fig14)
         self.fig12 = plt.figure(14)
         plt.title("Sum of generated eggs in month")
-        mlist = self.mounths_list(self.income_eggs)
+        mlist = self.mounths_list(self.income_eggs,False)
         freq_series = pd.Series(mlist)
         ax = freq_series.plot(kind='bar')
         plt.xticks(range(1,14))
